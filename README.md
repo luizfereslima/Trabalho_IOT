@@ -1,8 +1,8 @@
-# Documentação do Projeto: Sistema de Monitoramento de Ambiente com ESP32 e Protoboard
+# Documentação do Projeto: Sistema de Monitoramento de Ambiente CPD
 
 ## Introdução
 
-Este documento descreve o projeto de um sistema de monitoramento de ambiente utilizando um microcontrolador ESP32, sensores de presença, temperatura e porta, além de uma protoboard para facilitar a conexão dos componentes. O sistema é capaz de monitorar a presença de pessoas, a temperatura ambiente e o estado da porta em tempo real.
+Este projeto serve para monitorar uma sala de CPD, onde é necessario ter o controle de presença, sensor de temperatura para caso haja um pico de temperatura por falha do ar-condicionado e um sensor de porta para saber se está aberta ou não.
 
 ## Componentes Utilizados
 
@@ -34,29 +34,7 @@ O sensor de porta é utilizado para monitorar o estado da porta, isto é, se est
 
 O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utilizando uma protoboard:
 
-```
-   +--------------+       +---------------------+
-   |              |       |                     |
-   | Sensor de    |       | ESP32               |
-   | Presença     |       |                     |
-   |              |       |                     |
-   +------+-------+       +-----------+---------+
-          |                           |
-          |                           |
-          |    +--------------+       |
-          |    |              |       |
-          +----+ Protoboard   +-------+--------+
-               |              |                |
-               +------+-------+                |
-                      |                        |
-                      |                        |
-               +------+-------+       +--------+--------+
-               |              |       |                 |
-               | Sensor de    |       | Sensor de       |
-               | Temperatura  |       | Porta           |
-               |              |       |                 |
-               +--------------+       +-----------------+               
-```
+Print do tinkercad
 
 ## Conclusão
 
