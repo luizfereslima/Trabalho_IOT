@@ -40,7 +40,7 @@ O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utili
    | Sensor de    |       | ESP32               |
    | Presença     |       |                     |
    |              |       |                     |
-   +------+-------+       +----------+----------+
+   +------+-------+       +-----------+---------+
           |                           |
           |                           |
           |    +--------------+       |
