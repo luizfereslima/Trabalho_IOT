@@ -55,8 +55,7 @@ O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utili
                | Sensor de    |       | Sensor de       |
                | Temperatura  |       | Porta           |
                |              |       |                 |
-               +--------------+       +-----------------+
-               
+               +--------------+       +-----------------+               
 ```
 
 ## Conclusão
