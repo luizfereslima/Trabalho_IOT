@@ -30,11 +30,33 @@ O sensor de temperatura mede a temperatura ambiente e fornece essa informação 
 
 O sensor de porta é utilizado para monitorar o estado da porta, isto é, se está aberta ou fechada. Ele envia um sinal ao ESP32 indicando o status atual da porta, permitindo que o sistema acompanhe se a porta está sendo aberta ou fechada.
 
-## Diagrama de Conexão com Protoboard
+## Diagrama de relacionamento
 
-O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utilizando uma protoboard:
+O diagrama a seguir ilustra como os componentes serão relacionados:
 
-Print do tinkercad
+```
+   +--------------+       +---------------------+
+   |              |       |                     |
+   | Sensor de    |       | ESP32               |
+   | Presença     |       |                     |
+   |              |       |                     |
+   +------+-------+       +----------+----------+
+          |                           |
+          |                           |
+          |    +--------------+       |
+          |    |              |       |
+          +----+ Protoboard   +-------+--------+
+               |              |                |
+               +------+-------+                |
+                      |                        |
+                      |                        |
+               +------+-------+       +--------+--------+
+               |              |       |                 |
+               | Sensor de    |       | Sensor de       |
+               | Temperatura  |       | Porta           |
+               |              |       |                 |
+               +--------------+       +-----------------+
+```
 
 ## Conclusão
 
