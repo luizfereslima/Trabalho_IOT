@@ -34,6 +34,7 @@ O sensor de porta é utilizado para monitorar o estado da porta, isto é, se est
 
 O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utilizando uma protoboard:
 
+```
    +--------------+       +---------------------+
    |              |       |                     |
    | Sensor de    |       | ESP32               |
@@ -56,6 +57,7 @@ O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utili
                |              |       |                 |
                +--------------+       +-----------------+
                
+```
 
 ## Conclusão
 
