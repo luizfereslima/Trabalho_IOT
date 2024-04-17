@@ -16,7 +16,7 @@ Este documento descreve o projeto de um sistema de monitoramento de ambiente uti
 
 ## Funcionamento do Sistema
 
-O ESP32 é o componente central do sistema e é responsável por coletar dados dos sensores e enviar as informações para um dispositivo de visualização ou para uma plataforma de monitoramento remoto.
+O ESP32 é o componente central do sistema e é responsável por coletar dados dos sensores e enviar as informações para uma plataforma de monitoramento remoto.
 
 ### Sensor de Presença
 
@@ -24,7 +24,7 @@ O sensor de presença é utilizado para detectar a presença de pessoas no ambie
 
 ### Sensor de Temperatura
 
-O sensor de temperatura mede a temperatura ambiente e fornece essa informação ao ESP32. O microcontrolador então pode processar esses dados e, se necessário, enviar alertas caso a temperatura esteja fora de uma faixa desejada.
+O sensor de temperatura mede a temperatura ambiente e fornece essa informação ao ESP32.
 
 ### Sensor de Porta
 
@@ -34,7 +34,6 @@ O sensor de porta é utilizado para monitorar o estado da porta, isto é, se est
 
 O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utilizando uma protoboard:
 
-```
    +--------------+       +---------------------+
    |              |       |                     |
    | Sensor de    |       | ESP32               |
@@ -56,15 +55,7 @@ O diagrama a seguir ilustra como os componentes estão conectados ao ESP32 utili
                | Temperatura  |       | Porta           |
                |              |       |                 |
                +--------------+       +-----------------+
-```
-
-## Funcionalidades Adicionais
-
-Além da simples coleta de dados, o sistema pode ser expandido com as seguintes funcionalidades:
-
-- **Alertas:** O sistema pode ser configurado para enviar alertas por e-mail ou mensagem de texto caso detecte movimento inesperado, temperatura fora da faixa aceitável ou se a porta for aberta sem autorização.
-- **Histórico de Dados:** Os dados coletados podem ser armazenados em um banco de dados local ou na nuvem para posterior análise e referência.
-- **Integração com Plataforma IoT:** Os dados podem ser integrados a uma plataforma de IoT para monitoramento remoto e controle do ambiente.
+               
 
 ## Conclusão
 
