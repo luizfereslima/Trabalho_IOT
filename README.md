@@ -6,7 +6,7 @@ O projeto foi desenvolvido para solucionar um problema de controle na sala do CP
 
 ## Componentes Utilizados
 
-- Microcontrolador ESP32
+- Microcontrolador ESP8266
 - Sensor de Presença
 - Sensor de Temperatura
 - Sensor de Porta
@@ -16,7 +16,7 @@ O projeto foi desenvolvido para solucionar um problema de controle na sala do CP
 
 ## Funcionamento do Sistema
 
-O ESP32 é o componente central do sistema e é responsável por coletar dados dos sensores e enviar as informações para uma plataforma de monitoramento remoto.
+O ESP8266 é o componente central do sistema e é responsável por coletar dados dos sensores e enviar as informações para uma plataforma de monitoramento remoto.
 
 ### Sensor de Presença
 
@@ -24,40 +24,18 @@ O sensor de presença é utilizado para detectar a presença de pessoas no ambie
 
 ### Sensor de Temperatura
 
-O sensor de temperatura mede a temperatura ambiente e fornece essa informação ao ESP32.
+O sensor de temperatura mede a temperatura ambiente e fornece essa informação ao ESP8266.
 
 ### Sensor de Porta
 
-O sensor de porta é utilizado para monitorar o estado da porta, isto é, se está aberta ou fechada. Ele envia um sinal ao ESP32 indicando o status atual da porta, permitindo que o sistema acompanhe se a porta está sendo aberta ou fechada.
+O sensor de porta é utilizado para monitorar o estado da porta, isto é, se está aberta ou fechada. Ele envia um sinal ao ESP8266 indicando o status atual da porta, permitindo que o sistema acompanhe se a porta está sendo aberta ou fechada.
 
 ## Diagrama de relacionamento
 
 O diagrama a seguir ilustra como os componentes serão relacionados:
 
-```
-   +--------------+       +---------------------+
-   |              |       |                     |
-   | Sensor de    |       | ESP32               |
-   | Presença     |       |                     |
-   |              |       |                     |
-   +------+-------+       +----------+----------+
-          |                           |
-          |                           |
-          |    +--------------+       |
-          |    |              |       |
-          +----+ Protoboard   +-------+--------+
-               |              |                |
-               +------+-------+                |
-                      |                        |
-                      |                        |
-               +------+-------+       +--------+--------+
-               |              |       |                 |
-               | Sensor de    |       | Sensor de       |
-               | Temperatura  |       | Porta           |
-               |              |       |                 |
-               +--------------+       +-----------------+
-```
+![Imagem do WhatsApp de 2024-04-25 à(s) 13 47 12_7d4aa5e4](https://github.com/luizfereslima/Trabalho_IOT/assets/75223914/2cc20f77-6761-45d2-a4ff-1ea3cffb5033)
 
 ## Conclusão
 
-O sistema de monitoramento de ambiente com ESP32 oferece uma solução eficaz e versátil para monitorar a presença de pessoas, a temperatura ambiente e o estado da porta em tempo real. Com sua flexibilidade e capacidade de expansão, pode ser adaptado para uma variedade de aplicações, desde residenciais até comerciais e industriais.
+O sistema de monitoramento de ambiente com ESP8266 oferece uma solução eficaz e versátil para monitorar a presença de pessoas, a temperatura ambiente e o estado da porta em tempo real. Com sua flexibilidade e capacidade de expansão, pode ser adaptado para uma variedade de aplicações, desde residenciais até comerciais e industriais.
