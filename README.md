@@ -20,7 +20,7 @@ O ESP8266 é o componente central do sistema e é responsável por coletar dados
 
 ### Sensor de Presença
 
-O sensor de presença é utilizado para detectar a presença de pessoas no ambiente. Ele detecta movimentos e aciona um sinal elétrico quando identifica atividade. Este sinal é então interpretado pelo ESP32 para determinar se há alguém presente no local.
+O sensor de presença é utilizado para detectar a presença de pessoas no ambiente. Ele detecta movimentos e dispara um sinal elétrico quando identifica atividade. Este sinal é então interpretado pelo ESP32 para determinar se há alguém presente no local.
 
 ### Sensor de Temperatura
 
