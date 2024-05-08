@@ -8,8 +8,8 @@ DHTesp dht;
 const int pinoSensorPorta = 5;    // Pino onde o reed switch está conectado
 const int pinoBuzzer = 4;  // Pino do buzzer
 
-const char* ssid = "Ti-2G";
-const char* password = "Sup4@test";
+const char* ssid = "ESTACIO-VISITANTES";
+const char* password = "estacio@2014";
 
 ESP8266WebServer server(80);
 
