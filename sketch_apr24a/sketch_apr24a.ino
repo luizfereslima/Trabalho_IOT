@@ -4,18 +4,18 @@
 #include <ESP8266mDNS.h>
 #include "DHTesp.h"
 
+// Declaração das variáveis e objetos
 DHTesp dht;
-const int pinoSensorPorta = 5;    // GPIO5 (D1)
-const int pinoBuzzer = 16;        // GPIO16 (D0)
-const int pinoSensorPresenca = 4; // GPIO4 (D2)
-const int pinoLedVermelho = 15;   // GPIO15 (D8)
-const int pinoLedVerde = 13;      // GPIO13 (D7)
+const int pinoSensorPorta = 5;    // D1
+const int pinoBuzzer = 16;        // D0
+const int pinoSensorPresenca = 4; // D2
+const int pinoLedVermelho = 15;   // D8
+const int pinoLedVerde = 13;      // D7
 
-const char* ssid = "Ti-2G";
-const char* password = "Sup4@test";
+const char* ssid = "Lima"; // Nome da rede WI-FI
+const char* password = "flav2275"; // Senha da rede WI-FI
 
 ESP8266WebServer server(80);
-bool presencaDetectada = false; // Variável booleana para o sensor de presença
 
 void handleRoot() {
   float valorUmidade = dht.getHumidity();
@@ -46,10 +46,8 @@ void handleRoot() {
   
   if (presencaEstado == HIGH) {
     presencaStatus = "Presença detectada";
-    presencaDetectada = true;
   } else {
     presencaStatus = "Presença não detectada";
-    presencaDetectada = false;
   }
   
   // Verifica se houve falha na leitura do sensor de valorTemperatura e valorUmidade
@@ -59,14 +57,18 @@ void handleRoot() {
     return;
   }
 
-  // Constrói a mensagem de resposta com os valores lidos
-  String valorMonitoramento = "Umidade: " + String(valorUmidade) + "\n" +
-                   "Temperatura: " + String(valorTemperatura, 1) + "\n" +
-                   "Porta: " + portaStatus + "\n" +
-                   "Presença: " + presencaStatus + "\n" +
-                   "PresencaDetectada: " + String(presencaDetectada ? 1 : 0) + "\n";
-  
-  server.send(200, "text/plain", valorMonitoramento);
+  // Constrói a página HTML de resposta
+  String pagina = "<html><body>";
+  pagina += "<h1>Informações do Sensor</h1>";
+  pagina += "<table border='1'><tr><th>Parâmetro</th><th>Valor</th></tr>";
+  pagina += "<tr><td>Umidade</td><td>" + String(valorUmidade) + "%</td></tr>";
+  pagina += "<tr><td>Temperatura</td><td>" + String(valorTemperatura, 1) + " °C</td></tr>";
+  pagina += "<tr><td>Porta</td><td>" + portaStatus + "</td></tr>";
+  pagina += "<tr><td>Presença</td><td>" + presencaStatus + "</td></tr>";
+  pagina += "</table>";
+  pagina += "</body></html>";
+
+  server.send(200, "text/html", pagina);
 
   // Escreve os valores lidos no Serial Monitor
   Serial.print("Umidade: ");
@@ -78,9 +80,7 @@ void handleRoot() {
   Serial.print("Porta: ");
   Serial.print(portaStatus);
   Serial.print("\tPresença: ");
-  Serial.print(presencaStatus);
-  Serial.print("\tPresencaDetectada: ");
-  Serial.println(presencaDetectada ? 1 : 0);
+  Serial.println(presencaStatus);
 }
 
 void handleNotFound(){
@@ -89,7 +89,7 @@ void handleNotFound(){
 }
 
 void setup(void){
-  Serial.begin(9600);
+  Serial.begin(115200);
   dht.setup(14, DHTesp::DHT11); // GPIO14 (D5)
   pinMode(pinoSensorPorta, INPUT_PULLUP); // Configura o pino do reed switch como entrada (GPIO5)
   pinMode(pinoBuzzer, OUTPUT);  // Configura o pino do buzzer como saída (GPIO16)
@@ -99,78 +99,87 @@ void setup(void){
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");
+  Serial.println("Conectando ao Wi-Fi...");
 
   // Aguarda conexão
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("");
-  Serial.print("Conectado a ");
-  Serial.println(ssid);
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS iniciado");
+  // Verifica se a conexão foi bem-sucedida
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("");
+    Serial.print("Conectado a ");
+    Serial.println(ssid);
+    Serial.print("Endereço IP: ");
+    Serial.println(WiFi.localIP());
+
+    if (MDNS.begin("esp8266")) {
+      Serial.println("MDNS iniciado");
+    }
+
+    server.on("/", handleRoot);
+    server.onNotFound(handleNotFound);
+
+    server.begin();
+    Serial.println("Servidor HTTP iniciado");
+  } else {
+    Serial.println("Falha ao conectar ao Wi-Fi.");
   }
-
-  server.on("/", handleRoot);
-  server.onNotFound(handleNotFound);
-
-  server.begin();
-  Serial.println("Servidor HTTP iniciado");
 }
 
-void loop(void){
-  server.handleClient();
-  delay(600); // Delay entre cada leitura
-  
-  // Lê o estado do reed switch e imprime no Serial Monitor
-  int portaEstado = digitalRead(pinoSensorPorta);
-  String portaStatus;
-  
-  if (portaEstado == HIGH) {
-    portaStatus = "Aberta";
-    // Desliga o buzzer e acende o LED verde quando a porta está aberta
-    digitalWrite(pinoBuzzer, HIGH);
-    digitalWrite(pinoLedVermelho, LOW);
-    digitalWrite(pinoLedVerde, HIGH);
+void loop(void) {
+  if (WiFi.status() == WL_CONNECTED) {
+    server.handleClient();
+
+    // Lê os valores dos sensores
+    float valorUmidade = dht.getHumidity();
+    float valorTemperatura = dht.getTemperature();
+
+    int portaEstado = digitalRead(pinoSensorPorta);
+    String portaStatus;
+    if (portaEstado == HIGH) {
+      portaStatus = "Aberta";
+      digitalWrite(pinoBuzzer, HIGH);
+      digitalWrite(pinoLedVermelho, LOW);
+      digitalWrite(pinoLedVerde, HIGH);
+    } else {
+      portaStatus = "Fechada";
+      digitalWrite(pinoBuzzer, LOW);
+      digitalWrite(pinoLedVermelho, HIGH);
+      digitalWrite(pinoLedVerde, LOW);
+    }
+
+    int presencaEstado = digitalRead(pinoSensorPresenca);
+    String presencaStatus;
+    if (presencaEstado == HIGH) {
+      presencaStatus = "Presença detectada";
+    } else {
+      presencaStatus = "Presença não detectada";
+    }
+
+    // Verifica se houve falha na leitura do sensor de valorTemperatura e valorUmidade
+    if (isnan(valorUmidade) || isnan(valorTemperatura)) {
+      Serial.println("Falha ao ler do sensor DHT!");
+    } else {
+      // Escreve os valores lidos no Serial Monitor
+      Serial.print("Umidade: ");
+      Serial.print(valorUmidade);
+      Serial.print("%\t");
+      Serial.print("Temperatura: ");
+      Serial.print(valorTemperatura, 1);
+      Serial.print(" °C\t");
+      Serial.print("Porta: ");
+      Serial.print(portaStatus);
+      Serial.print("\tPresença: ");
+      Serial.println(presencaStatus);
+    }
+
+    delay(600); // Delay entre cada leitura
   } else {
-    portaStatus = "Fechada";
-    // Liga o buzzer e acende o LED vermelho quando a porta está fechada
-    digitalWrite(pinoBuzzer, LOW);
-    digitalWrite(pinoLedVermelho, HIGH);
-    digitalWrite(pinoLedVerde, LOW);
+    Serial.println("Tentando reconectar ao Wi-Fi...");
+    WiFi.reconnect();
+    delay(5000); // Espera 5 segundos antes de tentar novamente
   }
-
-  // Lê o estado do sensor de presença e imprime no Serial Monitor
-  int presencaEstado = digitalRead(pinoSensorPresenca);
-  String presencaStatus;
-  
-  if (presencaEstado == HIGH) {
-    presencaStatus = "Presença detectada";
-    presencaDetectada = true;
-  } else {
-    presencaStatus = "Presença não detectada";
-    presencaDetectada = false;
-  }
-
-  // Lê a valorUmidade e valorTemperatura e imprime no Serial Monitor
-  float valorUmidade = dht.getHumidity();
-  float valorTemperatura = dht.getTemperature();
-
-  Serial.print("Umidade: ");
-  Serial.print(valorUmidade);
-  Serial.print("%\t");
-  Serial.print("Temperatura: ");
-  Serial.print(valorTemperatura, 1);
-  Serial.print(" °C\t");
-  Serial.print("Porta: ");
-  Serial.print(portaStatus);
-  Serial.print("\tPresença: ");
-  Serial.print(presencaStatus);
-  Serial.print("\tPresencaDetectada: ");
-  Serial.println(presencaDetectada ? 1 : 0);
 }
