@@ -5,13 +5,17 @@
 #include "DHTesp.h"
 
 DHTesp dht;
-const int pinoSensorPorta = 5;    // Pino onde o reed switch está conectado
-const int pinoBuzzer = 4;  // Pino do buzzer
+const int pinoSensorPorta = 5;    // GPIO5 (D1)
+const int pinoBuzzer = 16;        // GPIO16 (D0)
+const int pinoSensorPresenca = 4; // GPIO4 (D2)
+const int pinoLedVermelho = 15;   // GPIO15 (D8)
+const int pinoLedVerde = 13;      // GPIO13 (D7)
 
-const char* ssid = "ESTACIO-VISITANTES";
-const char* password = "estacio@2014";
+const char* ssid = "Ti-2G";
+const char* password = "Sup4@test";
 
 ESP8266WebServer server(80);
+bool presencaDetectada = false; // Variável booleana para o sensor de presença
 
 void handleRoot() {
   float valorUmidade = dht.getHumidity();
@@ -24,12 +28,28 @@ void handleRoot() {
   // Verifica se o reed switch está acionado ou não
   if (portaEstado == HIGH) {
     portaStatus = "Aberta";
-    // Desliga o buzzer quando a porta está fechada
+    // Desliga o buzzer e acende o LED verde quando a porta está aberta
     digitalWrite(pinoBuzzer, HIGH);
+    digitalWrite(pinoLedVermelho, LOW);
+    digitalWrite(pinoLedVerde, HIGH);
   } else {
     portaStatus = "Fechada";
-    // Liga o buzzer quando a porta está aberta
+    // Liga o buzzer e acende o LED vermelho quando a porta está fechada
     digitalWrite(pinoBuzzer, LOW);
+    digitalWrite(pinoLedVermelho, HIGH);
+    digitalWrite(pinoLedVerde, LOW);
+  }
+  
+  // Lê o estado do sensor de presença
+  int presencaEstado = digitalRead(pinoSensorPresenca);
+  String presencaStatus;
+  
+  if (presencaEstado == HIGH) {
+    presencaStatus = "Presença detectada";
+    presencaDetectada = true;
+  } else {
+    presencaStatus = "Presença não detectada";
+    presencaDetectada = false;
   }
   
   // Verifica se houve falha na leitura do sensor de valorTemperatura e valorUmidade
@@ -42,7 +62,9 @@ void handleRoot() {
   // Constrói a mensagem de resposta com os valores lidos
   String valorMonitoramento = "Umidade: " + String(valorUmidade) + "\n" +
                    "Temperatura: " + String(valorTemperatura, 1) + "\n" +
-                   "Porta: " + portaStatus + "\n";
+                   "Porta: " + portaStatus + "\n" +
+                   "Presença: " + presencaStatus + "\n" +
+                   "PresencaDetectada: " + String(presencaDetectada ? 1 : 0) + "\n";
   
   server.send(200, "text/plain", valorMonitoramento);
 
@@ -54,7 +76,11 @@ void handleRoot() {
   Serial.print(valorTemperatura, 1);
   Serial.print(" °C\t");
   Serial.print("Porta: ");
-  Serial.println(portaStatus);
+  Serial.print(portaStatus);
+  Serial.print("\tPresença: ");
+  Serial.print(presencaStatus);
+  Serial.print("\tPresencaDetectada: ");
+  Serial.println(presencaDetectada ? 1 : 0);
 }
 
 void handleNotFound(){
@@ -64,9 +90,12 @@ void handleNotFound(){
 
 void setup(void){
   Serial.begin(9600);
-  dht.setup(14, DHTesp::DHT11); // D5
-  pinMode(pinoSensorPorta, INPUT_PULLUP); // Configura o pino do reed switch como entrada
-  pinMode(pinoBuzzer, OUTPUT);  // Configura o pino do buzzer como saída
+  dht.setup(14, DHTesp::DHT11); // GPIO14 (D5)
+  pinMode(pinoSensorPorta, INPUT_PULLUP); // Configura o pino do reed switch como entrada (GPIO5)
+  pinMode(pinoBuzzer, OUTPUT);  // Configura o pino do buzzer como saída (GPIO16)
+  pinMode(pinoSensorPresenca, INPUT); // Configura o pino do sensor de presença como entrada (GPIO4)
+  pinMode(pinoLedVermelho, OUTPUT); // Configura o pino do LED vermelho como saída (GPIO15)
+  pinMode(pinoLedVerde, OUTPUT); // Configura o pino do LED verde como saída (GPIO13)
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -104,12 +133,28 @@ void loop(void){
   
   if (portaEstado == HIGH) {
     portaStatus = "Aberta";
-    // Desliga o buzzer quando a porta está fechada
+    // Desliga o buzzer e acende o LED verde quando a porta está aberta
     digitalWrite(pinoBuzzer, HIGH);
+    digitalWrite(pinoLedVermelho, LOW);
+    digitalWrite(pinoLedVerde, HIGH);
   } else {
     portaStatus = "Fechada";
-    // Liga o buzzer quando a porta está aberta
+    // Liga o buzzer e acende o LED vermelho quando a porta está fechada
     digitalWrite(pinoBuzzer, LOW);
+    digitalWrite(pinoLedVermelho, HIGH);
+    digitalWrite(pinoLedVerde, LOW);
+  }
+
+  // Lê o estado do sensor de presença e imprime no Serial Monitor
+  int presencaEstado = digitalRead(pinoSensorPresenca);
+  String presencaStatus;
+  
+  if (presencaEstado == HIGH) {
+    presencaStatus = "Presença detectada";
+    presencaDetectada = true;
+  } else {
+    presencaStatus = "Presença não detectada";
+    presencaDetectada = false;
   }
 
   // Lê a valorUmidade e valorTemperatura e imprime no Serial Monitor
@@ -123,5 +168,9 @@ void loop(void){
   Serial.print(valorTemperatura, 1);
   Serial.print(" °C\t");
   Serial.print("Porta: ");
-  Serial.println(portaStatus);
+  Serial.print(portaStatus);
+  Serial.print("\tPresença: ");
+  Serial.print(presencaStatus);
+  Serial.print("\tPresencaDetectada: ");
+  Serial.println(presencaDetectada ? 1 : 0);
 }
