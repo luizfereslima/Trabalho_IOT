@@ -12,8 +12,8 @@ const int pinoSensorPresenca = 4; // D2
 const int pinoLedVermelho = 15;   // D8
 const int pinoLedVerde = 13;      // D7
 
-const char* ssid = "Lima"; // Nome da rede WI-FI
-const char* password = "flav2275"; // Senha da rede WI-FI
+const char* ssid = "Ti-2G-1A"; // Nome da rede WI-FI
+const char* password = "Sup4@test"; // Senha da rede WI-FI
 
 ESP8266WebServer server(80);
 
@@ -24,16 +24,19 @@ void handleRoot() {
   // Lê o estado do reed switch
   int portaEstado = digitalRead(pinoSensorPorta);
   String portaStatus;
+  String portaCor;
   
   // Verifica se o reed switch está acionado ou não
   if (portaEstado == HIGH) {
     portaStatus = "Aberta";
+    portaCor = "background-color: green;";
     // Desliga o buzzer e acende o LED verde quando a porta está aberta
     digitalWrite(pinoBuzzer, HIGH);
     digitalWrite(pinoLedVermelho, LOW);
     digitalWrite(pinoLedVerde, HIGH);
   } else {
     portaStatus = "Fechada";
+    portaCor = "background-color: red;";
     // Liga o buzzer e acende o LED vermelho quando a porta está fechada
     digitalWrite(pinoBuzzer, LOW);
     digitalWrite(pinoLedVermelho, HIGH);
@@ -43,11 +46,14 @@ void handleRoot() {
   // Lê o estado do sensor de presença
   int presencaEstado = digitalRead(pinoSensorPresenca);
   String presencaStatus;
+  String presencaCor;
   
   if (presencaEstado == HIGH) {
     presencaStatus = "Presença detectada";
+    presencaCor = "background-color: green;";
   } else {
     presencaStatus = "Presença não detectada";
+    presencaCor = "";
   }
   
   // Verifica se houve falha na leitura do sensor de valorTemperatura e valorUmidade
@@ -57,14 +63,22 @@ void handleRoot() {
     return;
   }
 
+  String temperaturaCor = "";
+  if (valorTemperatura > 25) {
+    temperaturaCor = "background-color: red;";
+  }
+
   // Constrói a página HTML de resposta
-  String pagina = "<html><body>";
-  pagina += "<h1>Informações do Sensor</h1>";
-  pagina += "<table border='1'><tr><th>Parâmetro</th><th>Valor</th></tr>";
-  pagina += "<tr><td>Umidade</td><td>" + String(valorUmidade) + "%</td></tr>";
-  pagina += "<tr><td>Temperatura</td><td>" + String(valorTemperatura, 1) + " °C</td></tr>";
-  pagina += "<tr><td>Porta</td><td>" + portaStatus + "</td></tr>";
-  pagina += "<tr><td>Presença</td><td>" + presencaStatus + "</td></tr>";
+  String pagina = "<html><head><meta charset='UTF-8'><meta http-equiv='refresh' content='0.3'>";
+  pagina += "<style>body { background-color: #f0f0f0; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }";
+  pagina += "table { width: 100%; height: 100%; table-layout: fixed; background-color: white; border-collapse: collapse; }";
+  pagina += "th, td { padding: 20px; border: 1px solid #ddd; font-size: 2em; text-align: center; }";
+  pagina += "th { background-color: #f2f2f2; }</style></head><body>";
+  pagina += "<table><tr><th>Parâmetro</th><th>Valor</th></tr>";
+  pagina += "<tr><td>⚗️ Umidade</td><td>" + String(valorUmidade) + "%</td></tr>";
+  pagina += "<tr><td>🌡 Temperatura</td><td style='" + temperaturaCor + "'>" + String(valorTemperatura, 1) + " &#8451;</td></tr>";
+  pagina += "<tr><td>🚪 Porta</td><td style='" + portaCor + "'>" + portaStatus + "</td></tr>";
+  pagina += "<tr><td>👤 Presença</td><td style='" + presencaCor + "'>" + presencaStatus + "</td></tr>";
   pagina += "</table>";
   pagina += "</body></html>";
 
@@ -132,51 +146,7 @@ void setup(void){
 void loop(void) {
   if (WiFi.status() == WL_CONNECTED) {
     server.handleClient();
-
-    // Lê os valores dos sensores
-    float valorUmidade = dht.getHumidity();
-    float valorTemperatura = dht.getTemperature();
-
-    int portaEstado = digitalRead(pinoSensorPorta);
-    String portaStatus;
-    if (portaEstado == HIGH) {
-      portaStatus = "Aberta";
-      digitalWrite(pinoBuzzer, HIGH);
-      digitalWrite(pinoLedVermelho, LOW);
-      digitalWrite(pinoLedVerde, HIGH);
-    } else {
-      portaStatus = "Fechada";
-      digitalWrite(pinoBuzzer, LOW);
-      digitalWrite(pinoLedVermelho, HIGH);
-      digitalWrite(pinoLedVerde, LOW);
-    }
-
-    int presencaEstado = digitalRead(pinoSensorPresenca);
-    String presencaStatus;
-    if (presencaEstado == HIGH) {
-      presencaStatus = "Presença detectada";
-    } else {
-      presencaStatus = "Presença não detectada";
-    }
-
-    // Verifica se houve falha na leitura do sensor de valorTemperatura e valorUmidade
-    if (isnan(valorUmidade) || isnan(valorTemperatura)) {
-      Serial.println("Falha ao ler do sensor DHT!");
-    } else {
-      // Escreve os valores lidos no Serial Monitor
-      Serial.print("Umidade: ");
-      Serial.print(valorUmidade);
-      Serial.print("%\t");
-      Serial.print("Temperatura: ");
-      Serial.print(valorTemperatura, 1);
-      Serial.print(" °C\t");
-      Serial.print("Porta: ");
-      Serial.print(portaStatus);
-      Serial.print("\tPresença: ");
-      Serial.println(presencaStatus);
-    }
-
-    delay(600); // Delay entre cada leitura
+    delay(300); // Delay entre cada leitura
   } else {
     Serial.println("Tentando reconectar ao Wi-Fi...");
     WiFi.reconnect();
